@@ -13,7 +13,9 @@ from scripts.csv_to_markdown.csv_processing import process_csv
 
 def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
 
-    def _csv_processing(urls: list, yml_config: dict, csv_path: Path, header: dict):
+    def _csv_processing(
+        urls: list, yml_config: dict, csv_path: Path, header: dict = None
+    ):
         # Metadata and data keys
         METADATA_KEYS = list(yml_config["metadata"].keys())
         DATA_KEYS = yml_config["dataset"]
