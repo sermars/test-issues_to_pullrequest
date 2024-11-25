@@ -15,14 +15,14 @@ from scripts.csv_to_markdown.markdown_processing import markdown_page
 def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
 
     def _csv_processing(
-        urls: list, yml_config: dict, csv_path: Path, header: dict = None
+        urls: list, cfg_yml: dict, csv_path: Path, header: dict = None
     ) -> dict:
         """
         Downloads and processes CSV files based on provided URLs and configuration.
 
         Args:
             - urls (list): List of URLs pointing to the CSV files to be downloaded.
-            - yml_config (dict): Configuration dictionary containing metadata and dataset keys.
+            - cfg_yml (dict): Configuration dictionary containing metadata and dataset keys.
             - csv_path (Path): Path to the directory where the CSV files will be downloaded.
              - header (dict, optional): Optional headers to include in the download request.
 
@@ -31,8 +31,8 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
                 values are the processed results.
         """
         # Metadata and data keys
-        METADATA_KEYS = list(yml_config["metadata"].keys())
-        DATA_KEYS = yml_config["dataset"]
+        METADATA_KEYS = list(cfg_yml["metadata"].keys())
+        DATA_KEYS = cfg_yml["dataset"]
 
         # Download the CSV in temporary folder
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -57,6 +57,23 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
 
         return results
 
+    def _markdown_creation(cfg_yml: dict, csv_content: dict):
+        METADATA_TABLE_MD = dict(
+            filter(
+                lambda item: item[0],
+                zip(
+                    map(lambda x: x["table_column"], cfg_yml["metadata"].values()),
+                    cfg_yml["metadata"].keys(),
+                ),
+            )
+        )
+        MD_INDEX_PAGE = Path(cfg_yml["markdowns"]["index"])
+        for file_name, (metadata, df) in csv_content.items():
+            mod_page, _ = markdown_page(metadata, df, MD_INDEX_PAGE, METADATA_TABLE_MD)
+            # save the markdown file (mod_page) in MD_INDEX_PAGE
+            with open(MD_INDEX_PAGE, "w") as md_file:
+                md_file.write(mod_page)
+
     # GitHub API
     GIT = Github(git_token)
     REPO = GIT.get_repo(repo_name)
@@ -72,26 +89,9 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
     PTH_FILES = Path(config_yml["github_actions"]["csv_path"])
     PTH_FILES.mkdir(parents=True, exist_ok=True)
     csv_processed = _csv_processing(csv_urls, config_yml, PTH_FILES)
-    print(f"::LOGGER:: Processed {csv_processed}")
 
     # Markdown processing
-    METADATA_TABLE_MD = dict(
-        filter(
-            lambda item: item[0],
-            zip(
-                map(lambda x: x["table_column"], config_yml["metadata"].values()),
-                config_yml["metadata"].keys(),
-            ),
-        )
-    )
-    for file_name, (metadata, df) in csv_processed.items():
-        mod_page, _ = markdown_page(
-            metadata,
-            df,
-            Path(config_yml["markdowns"]["index"]),
-            METADATA_TABLE_MD,
-        )
-        print(f"::LOGGER:: Markdown page modified: {mod_page}")
+    _markdown_creation(config_yml, csv_processed)
 
 
 if __name__ == "__main__":
