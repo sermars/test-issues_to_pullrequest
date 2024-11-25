@@ -1,0 +1,21 @@
+SUPER-NODE;SOUTH;;;;
+TEF-NODE;SPAIN;;;;
+SITE;VALENCIA;;;;
+DATASET;Waste Container;;;;
+DATA-MODEL;https://gitlab.com/vlci-public/models-dades/wastemanagement/-/blob/main/WasteContainer/spec.md?ref_type=heads;;;;
+FREQUENCY;5min;;;;
+HISTORICAL;no;;;;
+DATASET OWNER;Valencia City;;;;
+CONTACT;https://valencia.opendatasoft.com/pages/home/;;;;
+;;;;;
+;;ATTRIBUTE;TYPE;UNITS (SI);DESCRIPTION/COMMENTS
+;;location;geo:json;;Geojson reference to the element. Can be Point, LineString, Polygon, MultiPoint, MultiLineString or MultiPolygon
+;;address;string;;Civil address where the container is located.
+;;project;string;;Project to which this entity belongs.
+;;category;list;;Container category(s).
+;;storedWasteKind;string;;Type of waste stored.
+;;depth;number;m;Container depth
+;;height;number;m;Container height.
+;;fillingLevel;number;;Percentage of container filling in parts by 1.
+;;temeprature;number;ºC;Temperature inside the container.
+;;c_factor;number;;Multiplicative factor between [0 - 2] to adapt the measurement taken by the sensor with the visual % of filling that the client has of it.

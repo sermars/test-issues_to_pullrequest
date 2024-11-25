@@ -1,0 +1,19 @@
+SUPER-NODE;SOUTH;;;;
+TEF-NODE;SPAIN;;;;
+SITE;VALENCIA;;;;
+DATASET;Weather Forecast;;;;
+DATA-MODEL;https://gitlab.com/vlci-public/models-dades/weather/blob/main/WeatherForecast/spec.md;;;;
+FREQUENCY;15min;;;;
+HISTORICAL;29/1/200-current;;;;
+DATASET OWNER;Valencia City;;;;
+CONTACT;https://valencia.opendatasoft.com/pages/home/;;;;
+;;;;;
+;;ATTRIBUTE;TYPE;UNITS (SI);DESCRIPTION/COMMENTS
+;;name;string;;The name of where the weather forecast is located.
+;;location;geo:json;;Geojson reference to the element. It will be a Point.
+;;dateIssued;date-time;ISO8601 UTC;Date and time of issuance of the forecast in ISO8601 UTC format.
+;;validFrom;date-time;ISO8601 UTC;Date and time of start of the validity period in ISO8601 UTC format
+;;validTo;date-time;ISO8601 UTC;Date and time of end of the validity period in ISO8601 UTC format.
+;;temperatureSurface;number;ºC;Surface temperature.
+;;windSpeed;number;m/s;Wind speed at 10 meters high
+;;dewPoint2m;number;ºC;Dew point at 2 meters high.
