@@ -27,3 +27,6 @@ dataset:
 markdowns:
   index: "docs/data_catalog/index.md"
   dataset_details: "docs/data_catalog/metadata_datasets"
+
+github_actions:
+  csv_path: "/tmp/csv_files"
