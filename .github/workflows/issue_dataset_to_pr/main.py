@@ -32,7 +32,7 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
         # Process the CSV file
         with concurrent.futures.ThreadPoolExecutor() as executor:
             results = {
-                file_path.split("/")[-1]: result
+                file_path.name: result
                 for file_path, result in zip(
                     csv_files,
                     executor.map(
@@ -59,6 +59,7 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
     # Process the CSV file
     csv_urls = re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)
     csv_processed = _csv_processing(csv_urls, config_yml, PTH_FILES)
+    print(f"::LOGGER:: Processed {csv_processed}")
 
 
 if __name__ == "__main__":
