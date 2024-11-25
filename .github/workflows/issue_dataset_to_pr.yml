@@ -35,8 +35,10 @@ jobs:
     #     fi
     
     - name: "[GIT] Create temporary branch"
+      id: create_temp_branch
       run: |
         TEMP_BRANCH="temp-branch-${{ github.event.issue.number }}"
+        echo "TEMP_BRANCH=$TEMP_BRANCH" >> $GITHUB_ENV
         git checkout -b $TEMP_BRANCH
         git push --set-upstream origin $TEMP_BRANCH
 
@@ -80,13 +82,13 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add .
         git commit -m "Update data catalog for issue #${{ github.event.issue.number }}"
-        git push --set-upstream origin $TEMP_BRANCH
+        git push --set-upstream origin ${{ env.TEMP_BRANCH }}
     
     - name: "[GIT] Create Pull Request"
       uses: peter-evans/create-pull-request@v7.0.5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         base: develop
-        branch: $TEMP_BRANCH
+        branch: ${{ env.TEMP_BRANCH }}
         title: "[NEW DATASET]: Issue #${{ github.event.issue.number }}"
         body: "Automated changes to update the data catalog for issue #${{ github.event.issue.number }}."
