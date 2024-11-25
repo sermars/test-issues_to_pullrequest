@@ -20,17 +20,14 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
         METADATA_KEYS = list(yml_config["metadata"].keys())
         DATA_KEYS = yml_config["dataset"]
 
-        # # Get the link to the CSV file
-        # print(f"::LOGGER:: Issue comment: {issue_comment}")
-        # csv_urls = re.findall(r'\[.*?\]\((https://.*?\.csv)\)', issue_comment)
-
-        # Download the CSV files in parallel
+        # Download the CSV in temporary folder
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            csv_files = {
+            csv_url_to_path = {
                 file_path: download_file(file_path, csv_path, header)
                 for file_path in urls
             }
-        print(f"::LOGGER:: Downloaded {csv_files}")
+        print(f"::LOGGER:: Downloaded {csv_url_to_path}")
+        csv_files = list(csv_url_to_path.values())
 
         # Process the CSV file
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -39,9 +36,7 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
                 for file_path, result in zip(
                     csv_files,
                     executor.map(
-                        lambda file_path: process_csv(
-                            file_path, METADATA_KEYS, DATA_KEYS
-                        ),
+                        lambda f_pth: process_csv(f_pth, METADATA_KEYS, DATA_KEYS),
                         csv_files,
                     ),
                 )
