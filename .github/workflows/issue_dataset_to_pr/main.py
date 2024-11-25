@@ -58,9 +58,9 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
 
     # Check if the issue has a link to a CSV file
     assert any(re.findall(r"\[.*?\]\((.*?\.csv)\)", ISSUE.body)), "csv file not found."
-    
+
     # Process the CSV file
-    csv_urls = re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)
+    csv_urls = list(map(Path, re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)))
     csv_processed = _csv_processing(
         csv_urls, config_yml, PTH_FILES, {"Authorization": f"token {git_token}"}
     )
