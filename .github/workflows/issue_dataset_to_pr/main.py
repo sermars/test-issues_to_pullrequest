@@ -9,6 +9,7 @@ from github import Github
 
 from scripts.csv_to_markdown.utils import load_config, download_file
 from scripts.csv_to_markdown.csv_processing import process_csv
+from scripts.csv_to_markdown.markdown_processing import markdown_page
 
 
 def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
@@ -62,7 +63,9 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
     ISSUE = REPO.get_issue(int(issue_number))
 
     # Check if the issue has a link to a CSV file
-    assert any(re.findall(r"\[.*?\]\((.*?\.csv)\)", ISSUE.body)), "csv file not found."
+    assert any(
+        re.findall(r"\[.*?\]\((.*?\.csv)\)", ISSUE.body)
+    ), "csv file(s) not found."
 
     # Process the CSV file
     csv_urls = re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)
@@ -70,6 +73,25 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
     PTH_FILES.mkdir(parents=True, exist_ok=True)
     csv_processed = _csv_processing(csv_urls, config_yml, PTH_FILES)
     print(f"::LOGGER:: Processed {csv_processed}")
+
+    # Markdown processing
+    METADATA_TABLE_MD = dict(
+        filter(
+            lambda item: item[0],
+            zip(
+                map(lambda x: x["table_column"], config_yml["metadata"].values()),
+                config_yml["metadata"].keys(),
+            ),
+        )
+    )
+    for file_name, (metadata, df) in csv_processed.items():
+        mod_page, _ = markdown_page(
+            metadata,
+            df,
+            Path(config_yml["markdowns"]["index"]),
+            METADATA_TABLE_MD,
+        )
+        print(f"::LOGGER:: Markdown page modified: {mod_page}")
 
 
 if __name__ == "__main__":
