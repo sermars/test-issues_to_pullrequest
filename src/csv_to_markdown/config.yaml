@@ -1,0 +1,29 @@
+metadata:
+  SUPER-NODE:
+    table_column: "Super Node"
+  TEF-NODE:
+    table_column: ""
+  SITE:
+    table_column: "TEF Node"
+  DATASET:
+    table_column: "Dataset"
+  DATA-MODEL:
+    table_column: ""
+  FREQUENCY:
+    table_column: ""
+  HISTORICAL:
+    table_column: ""
+  DATASET OWNER:
+    table_column: "Owner"
+  CONTACT:
+    table_column: "Get Access"
+
+dataset:
+  - ATTRIBUTE
+  - TYPE
+  - UNITS (SI)
+  - DESCRIPTION/COMMENTS
+
+markdowns:
+  index: "docs/data_catalog/index.md"
+  dataset_details: "docs/data_catalog/metadata_datasets"
