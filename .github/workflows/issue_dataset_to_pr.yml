@@ -87,6 +87,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         base: develop
-        head: $TEMP_BRANCH
+        branch: $TEMP_BRANCH
         title: "[NEW DATASET]: Issue #${{ github.event.issue.number }}"
         body: "Automated changes to update the data catalog for issue #${{ github.event.issue.number }}."
