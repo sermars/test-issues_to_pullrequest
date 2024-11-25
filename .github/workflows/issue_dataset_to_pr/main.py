@@ -62,6 +62,7 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
     assert any(re.findall(r"\[.*?\]\((.*?\.csv)\)", ISSUE.body)), "csv file not found."
 
     # Process the CSV file
+    print(f"::LOGGER:: Issue: {ISSUE.body}")
     csv_urls = list(map(Path, re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)))
     print(f"::LOGGER:: CSV URLs: {csv_urls}")
     csv_processed = _csv_processing(csv_urls, config_yml, PTH_FILES)
