@@ -38,6 +38,7 @@ jobs:
       run: |
         TEMP_BRANCH="temp-branch-${{ github.event.issue.number }}"
         git checkout -b $TEMP_BRANCH
+        git push --set-upstream origin $TEMP_BRANCH
 
     - name: "[TASK] Set up Python"
       uses: actions/setup-python@v5.3.0
