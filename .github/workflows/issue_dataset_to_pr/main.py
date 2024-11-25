@@ -61,9 +61,8 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
 
     # Process the CSV file
     csv_urls = list(map(Path, re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)))
-    csv_processed = _csv_processing(
-        csv_urls, config_yml, PTH_FILES, {"Authorization": f"token {git_token}"}
-    )
+    print(f"::LOGGER:: CSV URLs: {csv_urls}")
+    csv_processed = _csv_processing(csv_urls, config_yml, PTH_FILES)
 
 
 if __name__ == "__main__":
