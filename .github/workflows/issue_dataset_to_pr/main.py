@@ -69,7 +69,7 @@ def main(git_token: str, repo_name: str, issue_number: str, config_yml: dict):
 
     # Process the CSV file
     csv_urls = re.findall(r"\[.*?\]\((https://.*?\.csv)\)", ISSUE.body)
-    PTH_FILES = config_yml["github_actions"]["csv_path"]
+    PTH_FILES = Path(config_yml["github_actions"]["csv_path"])
     PTH_FILES.mkdir(parents=True, exist_ok=True)
     csv_processed = _csv_processing(csv_urls, config_yml, PTH_FILES)
     print(f"::LOGGER:: Processed {csv_processed}")
