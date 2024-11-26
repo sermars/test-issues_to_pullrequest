@@ -40,25 +40,11 @@ jobs:
         git checkout -b $TEMP_BRANCH
         git push --set-upstream origin $TEMP_BRANCH
 
-    - name: "Set up Python"
-      uses: actions/setup-python@v5
+    - name: "Python script - csv Files to Markdown"
+      uses: ./.github/actions/csv_processing
       with:
-        python-version: '3.12.1'
-
-    - name: "Install dependencies"
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r .github/workflows/issue_dataset_to_pr/requirements.txt
-        pip install -r scripts/csv_to_markdown/requirements.txt
-
-    - name: "Run the Python script"
-      run: |
-        python .github/workflows/issue_dataset_to_pr/main.py 2>error.log
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        ISSUE_NUMBER: ${{ github.event.issue.number }}
-        PYTHONPATH: ${{ github.workspace }}
+        issue_number: ${{ github.event.issue.number }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: "Upload error log if exists"
       if: ${{ failure() }}
