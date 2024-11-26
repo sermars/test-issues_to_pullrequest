@@ -5,13 +5,15 @@ on:
     types: [opened]
 
 jobs:
-  run-script:
-    if: contains(github.event.issue.labels.*.name, 'new_dataset')
+  issue-notification:
+    if: |
+      github.event.issue.labels.*.name == 'new_dataset' &&
+      github.event.issue.state == 'open'
     runs-on: ubuntu-latest
 
     steps:
-    - name: "[ISSUE] Issue notification of start of processing"
-      uses: actions/github-script@v7.0.1
+    - name: "Issue notification of start of processing"
+      uses: actions/github-script@v7
       with:
         script: |
           github.rest.issues.createComment({
@@ -21,39 +23,52 @@ jobs:
             body: 'Your request is being processed...'
           })
 
-    - name: "[GIT] Clone the repository into the GitHub Actions"
-      uses: actions/checkout@v4.2.2
-    
-    # - name: "[GIT] Create develop branch if it does not exist"
-    #   run: |
-    #     git fetch origin
-    #     if ! git rev-parse --verify origin/develop; then
-    #       git checkout -b develop origin/main
-    #       git push origin develop
-    #     else
-    #       git checkout develop
-    #     fi
-    
-    - name: "[GIT] Create temporary branch"
-      id: create_temp_branch
+  git-preparation:
+    needs: issue-notification
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "Clone the repository into the GitHub Actions"
+      uses: actions/checkout@v4
+
+    - name: "Create temporary branch"
       run: |
         TEMP_BRANCH="request_new_dataset/branch-issue-${{ github.event.issue.number }}"
         echo "TEMP_BRANCH=$TEMP_BRANCH" >> $GITHUB_ENV
         git checkout -b $TEMP_BRANCH
         git push --set-upstream origin $TEMP_BRANCH
 
-    - name: "[TASK] Set up Python"
-      uses: actions/setup-python@v5.3.0
+    - name: "Upload repository as artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: repo-artifact
+        path: |
+          .github/workflows/issue_dataset_to_pr
+          docs
+          scripts
+
+  csv-processing:
+    needs: git-preparation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "Download repository as artifact"
+      uses: actions/download-artifact@v4
+      with:
+        name: repo-artifact
+
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12.1'
 
-    - name: "[TASK] Install dependencies"
+    - name: "Install dependencies"
       run: |
         python -m pip install --upgrade pip
         pip install -r .github/workflows/issue_dataset_to_pr/requirements.txt
         pip install -r scripts/csv_to_markdown/requirements.txt
 
-    - name: "[TASK] Run the Python script"
+    - name: "Run the Python script"
       run: |
         python .github/workflows/issue_dataset_to_pr/main.py 2>error.log
       env:
@@ -61,10 +76,33 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
         ISSUE_NUMBER: ${{ github.event.issue.number }}
         PYTHONPATH: ${{ github.workspace }}
+
+    - name: "Upload docs as artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: data-catalog
+        path: docs
     
-    - name: "[ISSUE] Comment on Issue if Error"
+    - name: "Upload error log if exists"
       if: ${{ failure() }}
-      uses: actions/github-script@v7.0.1
+      uses: actions/upload-artifact@v4
+      with:
+        name: error-log
+        path: error.log
+    
+  csv-error-handling:
+    needs: csv-processing
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "Download error log artifact"
+      uses: actions/download-artifact@v4
+      with:
+        name: error-log
+
+    - name: "Comment on Issue if Error"
+      uses: actions/github-script@v7
       with:
         script: |
           const fs = require('fs');
@@ -76,15 +114,25 @@ jobs:
             body: `An error occurred while processing the issue:\n\n\`\`\`\n${errorLog}\`\`\``
           });
 
-    - name: "[GIT] Commit and push changes"
+  git-changes:
+    needs: csv-processing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "Download docs artifact"
+      uses: actions/download-artifact@v4
+      with:
+        name: data-catalog
+
+    - name: "Commit and push changes"
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add .
         git commit -m "Update data catalog for issue #${{ github.event.issue.number }}"
     
-    - name: "[GIT] Create Pull Request"
-      uses: peter-evans/create-pull-request@v7.0.5
+    - name: "Create Pull Request"
+      uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         base: develop
@@ -92,8 +140,13 @@ jobs:
         title: "[NEW DATASET]: Issue #${{ github.event.issue.number }}"
         body: "Automated changes to update the data catalog for issue #${{ github.event.issue.number }}."
 
-    - name: "[ISSUE] Comment & Close the issue"
-      uses: actions/github-script@v7.0.1
+  close-issue:
+    needs: csv-processing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "Comment & Close the issue"
+      uses: actions/github-script@v7
       with:
         script: |
           github.rest.issues.createComment({
