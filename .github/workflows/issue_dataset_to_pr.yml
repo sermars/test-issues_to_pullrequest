@@ -43,6 +43,7 @@ jobs:
       with:
         name: repo-artifact
         path: |
+          .git
           .github/workflows/issue_dataset_to_pr
           docs
           scripts
@@ -81,7 +82,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: data-catalog
-        path: docs
+        path: |
+          .git
+          docs
     
     - name: "Upload error log if exists"
       if: ${{ failure() }}
@@ -128,7 +131,7 @@ jobs:
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add .
+        git add docs
         git commit -m "Update data catalog for issue #${{ github.event.issue.number }}"
     
     - name: "Create Pull Request"
