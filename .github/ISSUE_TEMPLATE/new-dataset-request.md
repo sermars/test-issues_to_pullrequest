@@ -7,19 +7,19 @@ assignees: ''
 
 ---
 
-# New Dataset
+# New Dataset(s) Request
 
-This issue parses the csv with the metadata of an available dataset and adds its content to a pull-request automatically.
+Request to add new datasets available on a site. Follow the instructions to process your request correctly.
 
 ## Instructions
 
 1. Add site name to the issue title (ex. `[NEWDATASET]: <site_name>`)
-2. Attach the corresponding **.csv**
-
-> Write **below** the comments you consider appropriate for the correct publication of your dataset.
-
-## Comments
+2. Attach the corresponding **.csv** (Each dataset in a different csv.)
 
 ## Attached _csv_ files
 
 > Add files here.
+
+## Comments
+
+> Add comments here.
