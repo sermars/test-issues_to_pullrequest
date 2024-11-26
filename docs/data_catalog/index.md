@@ -20,6 +20,8 @@ The data catalog is a centralized hub to keep track of available datasets. It is
 | WasteContainer      | Southern   | València City | València City Council | Partially   | [See specification](https://gitlab.com/vlci-public/models-dades/wastemanagement/-/blob/main/WasteContainer/spec.md)     | [Contact owner](https://valencia.opendatasoft.com/pages/home/) |
 | TrafficFlowObserved | Southern   | València City | València City Council | Partially   | [See specification](https://gitlab.com/vlci-public/models-dades/environment/-/blob/main/AirQualityObserved/spec.md)     | [Contact owner](https://valencia.opendatasoft.com/pages/home/) |
 | AirQualityObserved  | Southern   | València City | València City Council | Partially   | [See specification](https://gitlab.com/vlci-public/models-dades/transportation/-/blob/main/TrafficFlowObserved/spec.md) | [Contact owner](https://valencia.opendatasoft.com/pages/home/) |
+| Weather Forecast | SOUTH | VALENCIA | Valencia City |  |  | https://valencia.opendatasoft.com/pages/home/ |
+| Weather Forecast yes | SOUTH | VALENCIA | yo |  |  | https://valencia.opendatasoft.com/pages/home/ |
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
