@@ -7,8 +7,10 @@ on:
 jobs:
   issue-notification:
     if: |
-      github.event.issue.labels.*.name == 'new_dataset' &&
-      github.event.issue.state == 'open'
+      contains(
+        github.event.issue.labels.*.name == 'new_dataset' &&
+        github.event.issue.state == 'open'
+      )
     runs-on: ubuntu-latest
 
     steps:
